@@ -200,7 +200,7 @@ export default function App() {
           gap: 20,
           flexWrap: 'wrap',
           justifyContent: 'center',
-          maxWidth: 780,
+          maxWidth: 1160,
         }}>
           {/* NDF Card */}
           <div
@@ -297,6 +297,57 @@ export default function App() {
               marginTop: 16,
               fontSize: 10,
               color: '#3b82f6',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}>
+              Explorar →
+            </div>
+          </div>
+
+          {/* RIELES Card */}
+          <div
+            style={cardStyle('#ef4444')}
+            onClick={() => navigate('/rieles')}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = '#ef444460';
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 8px 32px rgba(239,68,68,0.15)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = '#ef444430';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            <div style={{
+              width: 36, height: 36, borderRadius: 8,
+              background: '#ef444415',
+              border: '1px solid #ef444430',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              marginBottom: 16,
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+                <circle cx="20" cy="12" r="2" fill="#ef4444" />
+              </svg>
+            </div>
+            <h2 style={{
+              fontSize: 20, fontWeight: 700, marginBottom: 6,
+              color: '#ef4444',
+            }}>
+              RIELES
+            </h2>
+            <p style={{ fontSize: 11, color: '#94a3b8', lineHeight: 1.5, marginBottom: 12 }}>
+              AT-07 · Matriz de Daño Sociotecnológico v1.2
+            </p>
+            <p style={{ fontSize: 10, color: '#64748b', lineHeight: 1.5 }}>
+              14 vectores convergentes en 4 categorías (nuclear, amplificador, contextual, endpoint) con umbral ponderado interactivo y distinción §7.
+            </p>
+            <div style={{
+              marginTop: 16,
+              fontSize: 10,
+              color: '#ef4444',
               display: 'flex',
               alignItems: 'center',
               gap: 6,
