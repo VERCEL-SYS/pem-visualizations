@@ -121,7 +121,7 @@ export default function EcosystemMap() {
   const moduleData = stageData && activeModule !== null ? stageData.modules[activeModule] : null;
 
   return (
-    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: "'Segoe UI', system-ui, sans-serif", color: C.white }}>
+    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: "'Segoe UI', system-ui, sans-serif", color: C.white, overflowY: "auto", height: "100vh" }}>
       {/* Header */}
       <div style={{ padding: "24px 32px 12px", borderBottom: `1px solid ${C.slate}33` }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
