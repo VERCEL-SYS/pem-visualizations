@@ -8,21 +8,52 @@ import RielesVisualization from './views/RIELES';
 import PLEAPipeline from './views/plea-pipeline';
 import SpectrumBioeffect from './views/spectrum-bioeffect';
 import EcosystemMap from './views/ecosystem-map';
+import LogViewer from './views/log-viewer';
 
 // ============================================================
-// SECURITY GATE — PIN + Access Log
+// SECURITY GATE — PIN + Access Log + IP/Geo
 // ============================================================
 const CORRECT_PIN = "2741";
 const MAX_ATTEMPTS = 5;
 const STORAGE_KEY = "pem-access-log";
 const SESSION_KEY = "pem-unlocked";
 
+// Cache IP/geo info once per session
+let cachedGeo = null;
+async function fetchGeo() {
+  if (cachedGeo) return cachedGeo;
+  try {
+    const res = await fetch("https://ipapi.co/json/");
+    if (res.ok) {
+      const data = await res.json();
+      cachedGeo = {
+        ip: data.ip || "",
+        city: data.city || "",
+        region: data.region || "",
+        country: data.country_name || "",
+        org: data.org || "",
+        timezone: data.timezone || "",
+      };
+    }
+  } catch (e) {
+    cachedGeo = { ip: "", city: "", region: "", country: "", org: "", timezone: "" };
+  }
+  return cachedGeo || {};
+}
+
 async function logAccess(type, details) {
   try {
+    const geo = await fetchGeo();
     const entry = {
       timestamp: new Date().toISOString(),
       type,
       details,
+      ip: geo.ip,
+      city: geo.city,
+      region: geo.region,
+      country: geo.country,
+      org: geo.org,
+      timezone: geo.timezone,
       userAgent: navigator.userAgent,
       platform: navigator.platform,
       screen: window.screen.width + "x" + window.screen.height,
@@ -89,7 +120,6 @@ function LockScreen({ onUnlock }) {
         width: "90%",
         textAlign: "center",
       }}>
-        {/* Lock icon */}
         <div style={{ marginBottom: 24 }}>
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="1.5" style={{ opacity: locked ? 0.3 : 0.8 }}>
             <rect x="3" y="11" width="18" height="11" rx="2" />
@@ -106,15 +136,9 @@ function LockScreen({ onUnlock }) {
 
         {locked ? (
           <div style={{
-            background: "#ef444415",
-            border: "1px solid #ef444430",
-            borderRadius: 8,
-            padding: "16px",
-            color: "#ef4444",
-            fontSize: 13,
-          }}>
-            {error}
-          </div>
+            background: "#ef444415", border: "1px solid #ef444430",
+            borderRadius: 8, padding: "16px", color: "#ef4444", fontSize: 13,
+          }}>{error}</div>
         ) : (
           <>
             <input
@@ -128,45 +152,23 @@ function LockScreen({ onUnlock }) {
               placeholder="PIN"
               autoFocus
               style={{
-                width: "100%",
-                padding: "14px 16px",
-                fontSize: 18,
-                letterSpacing: "0.3em",
-                textAlign: "center",
+                width: "100%", padding: "14px 16px", fontSize: 18,
+                letterSpacing: "0.3em", textAlign: "center",
                 background: "#1e293b",
                 border: "1px solid " + (error ? "#ef4444" : "#334155"),
-                borderRadius: 8,
-                color: "#e2e8f0",
-                outline: "none",
-                boxSizing: "border-box",
-                marginBottom: 16,
+                borderRadius: 8, color: "#e2e8f0", outline: "none",
+                boxSizing: "border-box", marginBottom: 16,
               }}
             />
-            <button
-              onClick={handleSubmit}
-              style={{
-                width: "100%",
-                padding: "12px",
-                fontSize: 14,
-                fontWeight: 600,
-                background: "#f59e0b",
-                color: "#000",
-                border: "none",
-                borderRadius: 8,
-                cursor: "pointer",
-              }}
-            >
-              Verificar
-            </button>
-            {error && (
-              <p style={{ color: "#ef4444", fontSize: 12, marginTop: 12 }}>{error}</p>
-            )}
+            <button onClick={handleSubmit} style={{
+              width: "100%", padding: "12px", fontSize: 14, fontWeight: 600,
+              background: "#f59e0b", color: "#000", border: "none",
+              borderRadius: 8, cursor: "pointer",
+            }}>Verificar</button>
+            {error && <p style={{ color: "#ef4444", fontSize: 12, marginTop: 12 }}>{error}</p>}
           </>
         )}
-
-        <p style={{ color: "#334155", fontSize: 9, marginTop: 24 }}>
-          Los accesos son registrados
-        </p>
+        <p style={{ color: "#334155", fontSize: 9, marginTop: 24 }}>Los accesos son registrados</p>
       </div>
     </div>
   );
@@ -194,6 +196,7 @@ function GatedApp() {
         <Route path="/plea" element={<PLEAPipeline />} />
         <Route path="/spectrum" element={<SpectrumBioeffect />} />
         <Route path="/ecosystem" element={<EcosystemMap />} />
+        <Route path="/log" element={<LogViewer />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>
