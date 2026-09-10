@@ -1,265 +1,240 @@
 import { useState } from "react";
 
-const C = {
-  bg: "#0B1622",
-  card: "#142236",
-  cardHover: "#1A2E48",
-  white: "#FFFFFF",
-  dim: "#8899AA",
-  teal: "#00B4D8",
-  mint: "#02C39A",
-  amber: "#F2C94C",
-  coral: "#E74C3C",
-  purple: "#A855F7",
-  slate: "#475569",
-};
+const C = { bg:"#0B1622", card:"#142236", cardHover:"#1A2E48", white:"#FFFFFF", dim:"#8899AA", teal:"#00B4D8", mint:"#02C39A", amber:"#F2C94C", coral:"#E74C3C", purple:"#A855F7", slate:"#475569" };
 
-const stages = [
-  {
-    id: "entrada", label: "ENTRADA", color: C.teal, icon: "◉",
-    modules: [
-      {
-        name: "Bitácora V4.2",
-        desc: "Registro diario estructurado en 11 categorías incluyendo PSYOPS/OHC, audio+espectrograma FFT, actores/perpetradores, tracking vehículos. Modo Guardián con auto-detección por umbral dB.",
-        feeds: "SEA-PEM Agent",
-        detail: "La bitácora es la materia prima que inicia toda la cadena: sin bitácora no hay investigación."
-      },
-      {
-        name: "Datos Instrumentales",
-        desc: "Arquitectura TSCM completa: monitoreo RF multi-banda continuo, análisis espectral broadband, medición campo E/RF/ELF, dosimetría ionizante.",
-        feeds: "Anexos Evidenciarios",
-        detail: "Cadena de custodia SHA-256. Correlación temporal multi-instrumento."
-      },
-    ],
-  },
-  {
-    id: "procesamiento", label: "PROCESAMIENTO", color: C.amber, icon: "⟳",
-    modules: [
-      {
-        name: "PEM Bioeffect Simulator",
-        desc: "Modelo computacional del exposoma sociotecnológico con 4 capas: Física (quad-domain), Digital/Cognitiva, Social/Contextual, Ambiental Clásica.",
-        feeds: "Instrumentos PEM",
-        detail: "8 cuadros clínicos simulados. Calibrado con datos reales de sesiones Guardian."
-      },
-      {
-        name: "Anexos Evidenciarios",
-        desc: "AT-DEW-E v0.4 (26 fuentes), AT-SAW-E v0.2 (21 fuentes), AT-MSA v0.1 (13 refs). Quad-domain forensic correlation: RF/EMF, ionizante, espectro, acústica.",
-        feeds: "Instrumentos PEM",
-        detail: "Verosimilitud AHI Tipo 1 por RF/EM pulsada: 82–93% (NASEM 2020)."
-      },
-    ],
-  },
-  {
-    id: "analisis", label: "ANÁLISIS", color: C.coral, icon: "◈",
-    modules: [
-      {
-        name: "8 Instrumentos PEM",
-        desc: "GHE-QI (D₁–D₅) · IDPI™ (7 componentes, 0-100) · ANV/AIVV (17 vectores) · BHS (5 dominios) · NDF · RIELES v1.3 (15 vectores) · ICGS · OCRI™",
-        feeds: "PLEA",
-        detail: "Cada instrumento cuantifica una dimensión diferente de la exposición y el daño."
-      },
-      {
-        name: "SEA-PEM Agent v14",
-        desc: "Evaluación cuantitativa estructurada en 4 tiers: Básico (activa PLEA L1), Estándar (L1-L2), Premium (L1-L4), Forense (L1-L5).",
-        feeds: "PLEA",
-        detail: "Condiciones internas: RIELES ≥4 nucleares, OCRI GHE-QI ≥0.60"
-      },
-    ],
-  },
-  {
-    id: "legal", label: "ARQ. LEGAL", color: C.purple, icon: "§",
-    modules: [
-      {
-        name: "PLEA v1.7",
-        desc: "5 niveles: Situation → Pattern → Mechanism → Attribution → Individual Case. Tríada normativa: Melzer + NATO P5 + CAJAR.",
-        feeds: "Salidas Jurídicas",
-        detail: "Inspirada en distinción situation/case de la CPI (Estatuto de Roma). Blindaje V1–V10."
-      },
-    ],
-  },
-  {
-    id: "accion", label: "ACCIÓN", color: C.mint, icon: "⚖",
-    modules: [
-      {
-        name: "Salidas Jurídicas",
-        desc: "Querella multi-fase, Blindaje contra desestimación (10 vectores), Argumentación Toulmin-Atienza, Admisibilidad probatoria, Protocolo R-FDT v1.0.",
-        feeds: null,
-        detail: "La capa más robusta del ecosistema: 6+ instrumentos jurídicos integrados."
-      },
-    ],
-  },
+const threatLayers = [
+  { label:"Capa Física", desc:"Infraestructura electromagnética, acústica e ionizante. Señales imperceptibles para los sentidos humanos que operan en frecuencias fuera del rango de percepción consciente.", character:"Invisible · Imperceptible · Continua", color:C.coral, icon:"◉" },
+  { label:"Capa Digital", desc:"Algoritmos de modulación conductual, perfilado neurocognitivo, dark patterns. Operan dentro de plataformas de uso cotidiano sin que el usuario perciba la manipulación.", character:"Ubicua · Normalizada · Adictiva", color:C.amber, icon:"◈" },
+  { label:"Capa Institucional", desc:"Marcos regulatorios fragmentados que normalizan la exposición. Cada sector regulado por separado; la convergencia entre sectores queda sin cobertura.", character:"Estructural · Sistémica · Legítima", color:C.teal, icon:"§" },
 ];
 
-const metrics = [
-  { val: "8", label: "Instrumentos PEM", color: C.teal },
-  { val: "4", label: "Dominios forenses", color: C.amber },
-  { val: "5", label: "Niveles PLEA", color: C.coral },
-  { val: "15", label: "Rieles AT-07", color: C.mint },
-  { val: "47+", label: "Fuentes científicas", color: C.purple },
-  { val: "10", label: "Vectores blindaje", color: C.amber },
+const actors = [
+  { role:"Comandante", desc:"Quien ordena o autoriza la operación de modulación. Puede ser institucional, corporativo o individual. Define objetivos y selecciona targets. Su distancia del punto de ejecución es parte de la arquitectura de denegabilidad.", color:C.coral, letter:"C" },
+  { role:"Operador", desc:"Quien ejecuta y controla los parámetros técnicos de la exposición. Acceso directo a los sistemas de modulación. Despliega la infraestructura y calibra la intensidad, frecuencia y duración de la intervención.", color:C.amber, letter:"O" },
+  { role:"Participante Civil", desc:"Persona reclutada o instrumentalizada para facilitar la operación sin necesariamente comprender su alcance. Puede actuar por incentivo, coerción o desconocimiento. Su participación dificulta la atribución y diluye la responsabilidad.", color:C.purple, letter:"P" },
+  { role:"Intermediario", desc:"Data brokers, proveedores de infraestructura, plataformas de distribución y prestadores de servicios técnicos. Facilitan la cadena sin necesariamente conocer el uso final de sus capacidades.", color:C.teal, letter:"I" },
+  { role:"Beneficiario", desc:"Quien obtiene ventaja de la modulación — comercial, política, institucional o personal. Puede ser distinto del comandante. Su interés es el motor económico o estratégico de la cadena.", color:C.mint, letter:"B" },
 ];
 
-function Orb({ x, y, r, color, active }) {
+const response = [
+  { stage:"DOCUMENTAR", desc:"Registro sistemático de la situación con evidencia instrumental verificable y cadena de custodia digital.", color:C.teal, icon:"1" },
+  { stage:"ANALIZAR", desc:"Evaluación cuantitativa de convergencia mediante instrumentos calibrados que detectan patrones invisibles al ojo humano.", color:C.amber, icon:"2" },
+  { stage:"ARTICULAR", desc:"Transformación de evidencia forense en estructura jurídica admisible, con respaldo normativo internacional.", color:C.coral, icon:"3" },
+  { stage:"PROTEGER", desc:"Mecanismos de protección procesal contra desestimación, con admisibilidad progresiva compatible con estándares laborales.", color:C.mint, icon:"4" },
+];
+
+function PulsingOrb({ x, y, r, color }) {
   return (
     <g>
-      <circle cx={x} cy={y} r={r * 2} fill={color} opacity={0.05}>
-        <animate attributeName="r" values={`${r*1.8};${r*2.5};${r*1.8}`} dur="4s" repeatCount="indefinite" />
+      <circle cx={x} cy={y} r={r*2} fill={color} opacity={0.04}>
+        <animate attributeName="r" values={`${r*1.5};${r*2.5};${r*1.5}`} dur="4s" repeatCount="indefinite"/>
       </circle>
-      <circle cx={x} cy={y} r={r} fill={color} opacity={active ? 0.9 : 0.5}>
-        <animate attributeName="opacity" values={`${active ? 0.7 : 0.3};${active ? 1 : 0.6};${active ? 0.7 : 0.3}`} dur="3s" repeatCount="indefinite" />
+      <circle cx={x} cy={y} r={r} fill={color} opacity={0.6}>
+        <animate attributeName="opacity" values="0.4;0.8;0.4" dur="3s" repeatCount="indefinite"/>
       </circle>
-      <circle cx={x} cy={y} r={r * 0.4} fill="#fff" opacity={0.3} />
+      <circle cx={x-r*0.2} cy={y-r*0.2} r={r*0.3} fill="#fff" opacity={0.2}/>
     </g>
   );
 }
 
-export default function EcosystemMap() {
-  const [activeStage, setActiveStage] = useState(null);
-  const [activeModule, setActiveModule] = useState(null);
-
-  const stageData = activeStage !== null ? stages[activeStage] : null;
-  const moduleData = stageData && activeModule !== null ? stageData.modules[activeModule] : null;
+export default function EcosystemPublic() {
+  const [view, setView] = useState("threat"); // threat | actors | response
 
   return (
-    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: "'Segoe UI', system-ui, sans-serif", color: C.white, overflowY: "auto", height: "100vh" }}>
-      {/* Header */}
-      <div style={{ padding: "24px 32px 12px", borderBottom: `1px solid ${C.slate}33` }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
-          <span style={{ background: C.mint, color: "#000", fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 4, letterSpacing: 1 }}>ECOSISTEMA</span>
-          <span style={{ color: C.dim, fontSize: 12 }}>Mapa del Pipeline Forense Integrado</span>
-        </div>
-        <h1 style={{ fontSize: 26, fontWeight: 700, margin: "8px 0 4px", letterSpacing: -0.5 }}>
-          Ecosistema de Seguridad PEM + PLEA
+    <div style={{ background:C.bg, minHeight:"100vh", height:"100vh", overflowY:"auto", fontFamily:"'Segoe UI',system-ui,sans-serif", color:C.white }}>
+      <div style={{ padding:"24px 32px 12px", borderBottom:`1px solid ${C.slate}33` }}>
+        <h1 style={{ fontSize:26, fontWeight:700, margin:"8px 0 4px", letterSpacing:-0.5 }}>
+          Ecosistema Forense: Amenaza y Respuesta
         </h1>
-        <p style={{ color: C.dim, fontSize: 13, margin: 0 }}>
-          De la bitácora a la acción judicial — pipeline completo de documentación forense
+        <p style={{ color:C.dim, fontSize:13, margin:0 }}>
+          Comprender la arquitectura de la amenaza para diseñar la respuesta forense adecuada
         </p>
       </div>
 
-      {/* Neural pipeline visualization */}
-      <div style={{ padding: "12px 16px 0" }}>
-        <svg viewBox="0 0 940 180" style={{ width: "100%", maxHeight: 160 }}>
-          {/* Connection lines */}
-          {stages.map((s, i) => {
-            if (i < 4) {
-              const x1 = 95 + i * 185 + 35;
-              const x2 = 95 + (i + 1) * 185 - 35;
-              const isActive = activeStage !== null && (activeStage === i || activeStage === i + 1);
+      {/* Tab navigation */}
+      <div style={{ display:"flex", gap:8, padding:"16px 32px 0" }}>
+        {[
+          { key:"threat", label:"Arquitectura de la Amenaza", color:C.coral },
+          { key:"actors", label:"Actores en la Cadena", color:C.amber },
+          { key:"response", label:"Respuesta Forense", color:C.mint },
+        ].map(t => (
+          <button key={t.key} onClick={() => setView(t.key)} style={{
+            background: view===t.key ? C.card : "transparent",
+            border: `1px solid ${view===t.key ? t.color+"55" : C.slate+"33"}`,
+            borderRadius:8, color: view===t.key ? t.color : C.dim,
+            fontSize:12, fontWeight: view===t.key?700:500,
+            padding:"10px 20px", cursor:"pointer", transition:"all 0.2s",
+          }}>{t.label}</button>
+        ))}
+      </div>
+
+      {/* THREAT VIEW */}
+      {view === "threat" && (
+        <div style={{ padding:"20px 32px", animation:"fadeIn 0.3s ease" }}>
+          <div style={{ textAlign:"center", marginBottom:20 }}>
+            <span style={{ fontSize:12, color:C.coral, fontWeight:600 }}>COGNITIVE WARFARE LAYERED ARCHITECTURE</span>
+            <p style={{ color:C.dim, fontSize:12, marginTop:4 }}>Las amenazas operan en capas superpuestas — cada una invisible por diseño</p>
+          </div>
+
+          {/* Layered visualization */}
+          <svg viewBox="0 0 800 200" style={{ width:"100%", maxHeight:180, marginBottom:16 }}>
+            {threatLayers.map((l,i) => {
+              const y = 30 + i*60;
+              const w = 700 - i*80;
+              const x = (800-w)/2;
               return (
-                <g key={`c${i}`}>
-                  <line x1={x1} y1={90} x2={x2} y2={90} stroke={s.color} strokeWidth={isActive ? 2 : 1} opacity={isActive ? 0.6 : 0.15} strokeDasharray={isActive ? "none" : "6 4"}>
-                    {isActive && <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite" />}
-                  </line>
-                  <polygon points={`${x2-6},85 ${x2},90 ${x2-6},95`} fill={s.color} opacity={isActive ? 0.5 : 0.15} />
+                <g key={i}>
+                  <rect x={x} y={y} width={w} height={50} rx={8} fill={l.color} opacity={0.08} stroke={l.color} strokeWidth={1} strokeOpacity={0.2}/>
+                  <PulsingOrb x={x+30} y={y+25} r={12} color={l.color}/>
+                  <text x={x+52} y={y+22} fill={l.color} fontSize={12} fontWeight="700">{l.label}</text>
+                  <text x={x+52} y={y+38} fill={C.dim} fontSize={10}>{l.character}</text>
+                  <text x={x+w-10} y={y+30} fill={l.color} fontSize={14} textAnchor="end" opacity={0.4}>{l.icon}</text>
                 </g>
               );
-            }
-            return null;
-          })}
+            })}
+          </svg>
 
-          {/* Stage orbs */}
-          {stages.map((s, i) => {
-            const cx = 95 + i * 185;
-            const isActive = activeStage === i;
-            return (
-              <g key={i} style={{ cursor: "pointer" }} onClick={() => { setActiveStage(activeStage === i ? null : i); setActiveModule(null); }}>
-                <Orb x={cx} y={90} r={isActive ? 32 : 26} color={s.color} active={isActive} />
-                <text x={cx} y={88} textAnchor="middle" fill="#fff" fontSize={16} fontWeight="600" dominantBaseline="middle">
-                  {s.icon}
-                </text>
-                <rect x={cx - 45} y={130} width={90} height={20} rx={4} fill={s.color} opacity={isActive ? 0.3 : 0.12} />
-                <text x={cx} y={143} textAnchor="middle" fill={isActive ? "#fff" : s.color} fontSize={9} fontWeight="700" letterSpacing={0.8}>
-                  {s.label}
-                </text>
-                <text x={cx} y={168} textAnchor="middle" fill={C.dim} fontSize={9}>
-                  {s.modules.length} módulo{s.modules.length > 1 ? "s" : ""}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-      </div>
-
-      {/* Stage detail */}
-      <div style={{ padding: "0 32px 12px" }}>
-        {stageData ? (
-          <div style={{ animation: "fadeIn 0.3s ease" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <span style={{ background: stageData.color, color: stageData.color === C.amber ? "#000" : "#fff", fontSize: 11, fontWeight: 700, padding: "4px 12px", borderRadius: 6 }}>{stageData.label}</span>
-              <span style={{ color: C.dim, fontSize: 12 }}>Selecciona un módulo para ver detalle</span>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: stageData.modules.length > 1 ? "1fr 1fr" : "1fr", gap: 12 }}>
-              {stageData.modules.map((mod, i) => {
-                const isActive = activeModule === i;
-                return (
-                  <div key={i}
-                    onClick={() => setActiveModule(isActive ? null : i)}
-                    style={{
-                      background: isActive ? C.cardHover : C.card,
-                      borderRadius: 10, padding: 18, cursor: "pointer",
-                      border: `1px solid ${isActive ? stageData.color + "55" : C.slate + "22"}`,
-                      transition: "all 0.2s ease",
-                    }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: stageData.color, marginBottom: 8 }}>
-                      {mod.name}
-                    </div>
-                    <div style={{ fontSize: 11.5, color: C.dim, lineHeight: 1.5 }}>
-                      {mod.desc}
-                    </div>
-                    {isActive && (
-                      <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${C.slate}33`, animation: "fadeIn 0.2s ease" }}>
-                        <div style={{ fontSize: 11, color: stageData.color, fontWeight: 600, marginBottom: 4 }}>NOTA CLAVE</div>
-                        <div style={{ fontSize: 12, color: "#fff", lineHeight: 1.5, fontStyle: "italic" }}>{mod.detail}</div>
-                        {mod.feeds && (
-                          <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 6 }}>
-                            <span style={{ fontSize: 10, color: C.dim }}>Alimenta →</span>
-                            <span style={{ fontSize: 11, color: stageData.color, fontWeight: 600 }}>{mod.feeds}</span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ) : (
-          <div style={{ background: C.card, borderRadius: 12, padding: 20, border: `1px solid ${C.slate}33`, textAlign: "center" }}>
-            <p style={{ color: C.dim, fontSize: 14, margin: 0 }}>Selecciona una etapa del pipeline para explorar sus módulos</p>
-          </div>
-        )}
-      </div>
-
-      {/* Metrics */}
-      <div style={{ padding: "8px 32px 8px" }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: C.dim, marginBottom: 10, letterSpacing: 1 }}>MÉTRICAS DEL ECOSISTEMA</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 8 }}>
-          {metrics.map((m, i) => (
-            <div key={i} style={{ background: C.card, borderRadius: 8, padding: "10px 8px", textAlign: "center" }}>
-              <div style={{ fontSize: 24, fontWeight: 700, color: m.color }}>{m.val}</div>
-              <div style={{ fontSize: 9, color: C.dim, marginTop: 2 }}>{m.label}</div>
+          {threatLayers.map((l,i) => (
+            <div key={i} style={{ background:C.card, borderRadius:10, padding:"16px 20px", marginBottom:10, borderLeft:`3px solid ${l.color}` }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
+                <span style={{ fontSize:14, fontWeight:700, color:l.color }}>{l.label}</span>
+                <span style={{ fontSize:10, color:l.color, background:`${l.color}15`, padding:"3px 10px", borderRadius:4 }}>{l.character}</span>
+              </div>
+              <p style={{ fontSize:12, color:C.dim, lineHeight:1.6, margin:0 }}>{l.desc}</p>
             </div>
           ))}
+
+          <div style={{ background:C.card, borderRadius:10, padding:"14px 20px", textAlign:"center", border:`1px solid ${C.coral}22`, marginTop:12 }}>
+            <span style={{ fontSize:12, color:C.coral, fontWeight:600 }}>
+              La arquitectura de invisibilidad: vector imperceptible → cuadro clínico mimético → atribución imposible por vías convencionales
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Entities */}
-      <div style={{ padding: "12px 32px 8px" }}>
-        <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-          {["NeuroEthics Research Lab", "PAI LABS", "LIBERTECH"].map((e, i) => (
-            <span key={i} style={{
-              fontSize: 10, color: C.dim, padding: "4px 12px",
-              border: `1px solid ${C.slate}33`, borderRadius: 4,
-            }}>{e}</span>
-          ))}
+      {/* ACTORS VIEW */}
+      {view === "actors" && (
+        <div style={{ padding:"20px 32px", animation:"fadeIn 0.3s ease" }}>
+          <p style={{ color:C.dim, fontSize:13, lineHeight:1.6, marginBottom:20 }}>
+            La convergencia tecnológica involucra una cadena de mando con roles diferenciados. La responsabilidad es distribuida — lo cual no equivale a su ausencia. Cada actor responde por su contribución.
+          </p>
+
+          <svg viewBox="0 0 900 180" style={{ width:"100%", maxHeight:160, marginBottom:16 }}>
+            {/* Command chain arrow background */}
+            <defs>
+              <linearGradient id="chainGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor={C.coral} stopOpacity={0.15}/>
+                <stop offset="50%" stopColor={C.purple} stopOpacity={0.15}/>
+                <stop offset="100%" stopColor={C.mint} stopOpacity={0.15}/>
+              </linearGradient>
+            </defs>
+            <rect x={70} y={68} width={760} height={4} rx={2} fill="url(#chainGrad)"/>
+
+            {actors.map((a,i) => {
+              const cx = 100+i*175;
+              return (
+                <g key={i}>
+                  <PulsingOrb x={cx} y={70} r={24} color={a.color}/>
+                  <text x={cx} y={68} textAnchor="middle" fill="#fff" fontSize={12} fontWeight="700" dominantBaseline="middle">{a.letter}</text>
+                  <text x={cx} y={115} textAnchor="middle" fill={a.color} fontSize={10.5} fontWeight="600">{a.role}</text>
+                  {i<4 && (
+                    <g>
+                      <line x1={cx+30} y1={70} x2={cx+145} y2={70} stroke={a.color} strokeWidth={1.5} opacity={0.25} strokeDasharray="4 3"/>
+                      <polygon points={`${cx+141},66 ${cx+148},70 ${cx+141},74`} fill={a.color} opacity={0.3}/>
+                    </g>
+                  )}
+                </g>
+              );
+            })}
+
+            {/* Labels */}
+            <text x={100} y={150} fill={C.coral} fontSize={9} fontStyle="italic" opacity={0.5}>Cadena de mando</text>
+            <text x={450} y={150} fill={C.purple} fontSize={9} fontStyle="italic" opacity={0.5} textAnchor="middle">Participación civil</text>
+            <text x={800} y={150} fill={C.mint} fontSize={9} fontStyle="italic" opacity={0.5} textAnchor="end">Beneficio</text>
+          </svg>
+
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
+            {actors.slice(0,3).map((a,i) => (
+              <div key={i} style={{ background:C.card, borderRadius:10, padding:"14px 16px", borderLeft:`3px solid ${a.color}` }}>
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+                  <div style={{ width:24,height:24,borderRadius:"50%",background:a.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,color:"#fff" }}>{a.letter}</div>
+                  <span style={{ fontSize:13, fontWeight:700, color:a.color }}>{a.role}</span>
+                </div>
+                <p style={{ fontSize:11, color:C.dim, lineHeight:1.5, margin:0 }}>{a.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginTop:10 }}>
+            {actors.slice(3).map((a,i) => (
+              <div key={i} style={{ background:C.card, borderRadius:10, padding:"14px 16px", borderLeft:`3px solid ${a.color}` }}>
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+                  <div style={{ width:24,height:24,borderRadius:"50%",background:a.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,color:"#fff" }}>{a.letter}</div>
+                  <span style={{ fontSize:13, fontWeight:700, color:a.color }}>{a.role}</span>
+                </div>
+                <p style={{ fontSize:11, color:C.dim, lineHeight:1.5, margin:0 }}>{a.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ background:C.card, borderRadius:10, padding:"14px 20px", textAlign:"center", border:`1px solid ${C.amber}22`, marginTop:16 }}>
+            <span style={{ fontSize:12, color:C.amber, fontWeight:600 }}>
+              La cadena de mando opera con denegabilidad por diseño. La participación civil diluye la atribución. El ecosistema forense documenta cada eslabón.
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
-      <div style={{ textAlign: "center", padding: "12px 0 16px", borderTop: `1px solid ${C.slate}22` }}>
-        <span style={{ fontSize: 10, color: C.slate }}>NeuroEthics Research Lab — NeuroEthics.cl — PEM Ecosystem v11</span>
-      </div>
+      {/* RESPONSE VIEW */}
+      {view === "response" && (
+        <div style={{ padding:"20px 32px", animation:"fadeIn 0.3s ease" }}>
+          <p style={{ color:C.dim, fontSize:13, lineHeight:1.6, marginBottom:20 }}>
+            Ante amenazas invisibles, silenciosas y distribuidas, la respuesta forense debe ser sistemática, verificable y progresiva.
+          </p>
 
-      <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+          <svg viewBox="0 0 800 120" style={{ width:"100%", maxHeight:100, marginBottom:16 }}>
+            {response.map((r,i) => {
+              const cx = 110+i*180;
+              return (
+                <g key={i}>
+                  <PulsingOrb x={cx} y={55} r={22} color={r.color}/>
+                  <text x={cx} y={52} textAnchor="middle" fill="#fff" fontSize={14} fontWeight="700" dominantBaseline="middle">{r.icon}</text>
+                  <text x={cx} y={92} textAnchor="middle" fill={r.color} fontSize={10} fontWeight="700" letterSpacing={0.5}>{r.stage}</text>
+                  {i<3 && (
+                    <g>
+                      <line x1={cx+28} y1={55} x2={cx+152} y2={55} stroke={r.color} strokeWidth={1.5} opacity={0.3}/>
+                      <polygon points={`${cx+148},50 ${cx+155},55 ${cx+148},60`} fill={r.color} opacity={0.3}/>
+                    </g>
+                  )}
+                </g>
+              );
+            })}
+          </svg>
+
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+            {response.map((r,i) => (
+              <div key={i} style={{ background:C.card, borderRadius:10, padding:"16px 20px", borderLeft:`3px solid ${r.color}` }}>
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
+                  <div style={{ width:28,height:28,borderRadius:"50%",background:r.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"#fff" }}>{r.icon}</div>
+                  <span style={{ fontSize:14, fontWeight:700, color:r.color }}>{r.stage}</span>
+                </div>
+                <p style={{ fontSize:12, color:C.dim, lineHeight:1.6, margin:0 }}>{r.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ background:C.card, borderRadius:10, padding:"14px 20px", textAlign:"center", border:`1px solid ${C.mint}22`, marginTop:16 }}>
+            <span style={{ fontSize:12, color:C.dim }}>Respaldado por </span>
+            <span style={{ fontSize:12, color:C.mint, fontWeight:600 }}>más de 47 fuentes científicas peer-reviewed</span>
+            <span style={{ fontSize:12, color:C.dim }}> y soporte normativo de </span>
+            <span style={{ fontSize:12, color:C.amber, fontWeight:600 }}>ONU · NATO · Corte IDH</span>
+          </div>
+        </div>
+      )}
+
+      <div style={{ textAlign:"center", padding:"12px 0 16px", borderTop:`1px solid ${C.slate}22` }}>
+        <span style={{ fontSize:10, color:C.slate }}>NeuroEthics Research Lab — NeuroEthics.cl — PEM Ecosystem v11</span>
+      </div>
+      <style>{`@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }`}</style>
     </div>
   );
 }
