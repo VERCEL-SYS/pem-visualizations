@@ -8,12 +8,56 @@ const threatLayers = [
   { label:"Capa Institucional", desc:"Marcos regulatorios fragmentados que normalizan la exposición. Cada sector regulado por separado; la convergencia entre sectores queda sin cobertura.", character:"Estructural · Sistémica · Legítima", color:C.teal, icon:"§" },
 ];
 
-const actors = [
-  { role:"Comandante", desc:"Quien ordena o autoriza la operación de modulación. Puede ser institucional, corporativo o individual. Define objetivos y selecciona targets. Su distancia del punto de ejecución es parte de la arquitectura de denegabilidad.", color:C.coral, letter:"C" },
-  { role:"Operador", desc:"Quien ejecuta y controla los parámetros técnicos de la exposición. Acceso directo a los sistemas de modulación. Despliega la infraestructura y calibra la intensidad, frecuencia y duración de la intervención.", color:C.amber, letter:"O" },
-  { role:"Participante Civil", desc:"Persona reclutada o instrumentalizada para facilitar la operación sin necesariamente comprender su alcance. Puede actuar por incentivo, coerción o desconocimiento. Su participación dificulta la atribución y diluye la responsabilidad.", color:C.purple, letter:"P" },
-  { role:"Intermediario", desc:"Data brokers, proveedores de infraestructura, plataformas de distribución y prestadores de servicios técnicos. Facilitan la cadena sin necesariamente conocer el uso final de sus capacidades.", color:C.teal, letter:"I" },
-  { role:"Beneficiario", desc:"Quien obtiene ventaja de la modulación — comercial, política, institucional o personal. Puede ser distinto del comandante. Su interés es el motor económico o estratégico de la cadena.", color:C.mint, letter:"B" },
+const capabilities = [
+  { req:"Infraestructura de radiofrecuencia de banda ancha con capacidad de focalización", icon:"⟐", color:C.coral },
+  { req:"Acceso a redes de telecomunicaciones y plataformas de monitoreo masivo", icon:"⟐", color:C.coral },
+  { req:"Presupuesto sostenido en el orden de cientos de millones de dólares anuales", icon:"⟐", color:C.amber },
+  { req:"Personal técnico con clearance de seguridad y protocolos de investigación en sujetos humanos", icon:"⟐", color:C.amber },
+  { req:"Capacidad de operar sin supervisión judicial ni consentimiento informado", icon:"⟐", color:C.purple },
+  { req:"Mecanismos de denegabilidad institucionalizada y clasificación de información", icon:"⟐", color:C.purple },
+];
+
+const timeline = [
+  {
+    period:"1950–1960s", phase:"Experimentación directa",
+    tech:"Administración farmacológica (LSD, mescalina), electroshock, privación sensorial, electrodos cerebrales implantados",
+    civilians:"Civiles no informados, pacientes psiquiátricos, prisioneros",
+    evidence:"Desclasificación completa. 20,000+ páginas. Admisión institucional ante Congreso.",
+    sources:"Church Committee (1975) · CIA Inspector General Report (1963)",
+    pem:"Nivel 5 — Evidencia primaria", color:C.coral,
+  },
+  {
+    period:"1970–1980s", phase:"Transición electromagnética",
+    tech:"Efecto auditivo por microondas (Frey, 1962), investigación EM de baja intensidad, primeros sistemas experimentales de voz dirigida",
+    civilians:"Whistleblowers, disidentes, personal militar, familias de sujetos de fases anteriores",
+    evidence:"Peer-reviewed (Frey 1962, Bawin & Adey 1976 PNAS). Programa Pandora documentado (DIA).",
+    sources:"Frey (1962) J. Applied Physiology · Bawin & Adey (1976) PNAS",
+    pem:"Nivel 4 — Parcial verificable", color:C.amber,
+  },
+  {
+    period:"1990–2000s", phase:"Operación remota y convergencia",
+    tech:"Active Denial System (95 GHz, desclasificado), torres celulares, satélites, entrainment neuronal por ELF, neuroestimulación transcraneal",
+    civilians:"Expansión documentada a civiles en contextos de denuncia y exposición de corrupción institucional",
+    evidence:"ADS: desclasificado y desplegado. Vigilancia masiva: confirmada (Snowden/NSA, 2013).",
+    sources:"NAS (2020) Assessment of Ill Health · NAS-DIA (2008) Bioeffects of Selected NLW",
+    pem:"Nivel 3–5 — Mixta", color:C.teal,
+  },
+  {
+    period:"2010–2026", phase:"Convergencia IA + Neurotecnología",
+    tech:"5G/6G, satélites LEO, drones, IoT, wearables neurotecnológicos, IA para análisis conductual, bioamplificación de espectro expandido",
+    civilians:"Whistleblowers, activistas, periodistas, civiles. Escala y sistematicidad crecientes.",
+    evidence:"Contrato FOIA FA8650-13-D-6368: protocolos de investigación biomédica en sujetos humanos. Nanoporación celular, daño ADN/ARN, audición por microondas.",
+    sources:"NDAA FY2026 §4201 · NATO STO HFM-311 · Contrato FOIA FA8650-13-D-6368",
+    pem:"Nivel 2–5 — Variable", color:C.purple,
+  },
+];
+
+const budgetLines = [
+  { program:"High Energy Laser (HEL)", amount:"$345.2M", source:"RDTE Army FY2026", color:C.coral },
+  { program:"Directed Energy Weapons (DE)", amount:"$287.6M", source:"RDTE Navy/AF FY2026", color:C.coral },
+  { program:"Counter-Electronics HPM", amount:"$89.4M", source:"RDTE Army FY2026", color:C.amber },
+  { program:"Acoustic/Non-Lethal Weapons", amount:"$67.8M", source:"JNLWD FY2026", color:C.amber },
+  { program:"Cognitive Security / EW", amount:"$160.0M+", source:"DARPA / IARPA FY2026", color:C.purple },
 ];
 
 const response = [
@@ -38,7 +82,8 @@ function PulsingOrb({ x, y, r, color }) {
 }
 
 export default function EcosystemPublic() {
-  const [view, setView] = useState("threat"); // threat | actors | response
+  const [view, setView] = useState("threat");
+  const [expandedPhase, setExpandedPhase] = useState(null);
 
   return (
     <div style={{ background:C.bg, minHeight:"100vh", height:"100vh", overflowY:"auto", fontFamily:"'Segoe UI',system-ui,sans-serif", color:C.white }}>
@@ -52,10 +97,10 @@ export default function EcosystemPublic() {
       </div>
 
       {/* Tab navigation */}
-      <div style={{ display:"flex", gap:8, padding:"16px 32px 0" }}>
+      <div style={{ display:"flex", gap:8, padding:"16px 32px 0", flexWrap:"wrap" }}>
         {[
           { key:"threat", label:"Arquitectura de la Amenaza", color:C.coral },
-          { key:"actors", label:"Actores en la Cadena", color:C.amber },
+          { key:"trace", label:"Trazabilidad Documentada", color:C.amber },
           { key:"response", label:"Respuesta Forense", color:C.mint },
         ].map(t => (
           <button key={t.key} onClick={() => setView(t.key)} style={{
@@ -68,7 +113,7 @@ export default function EcosystemPublic() {
         ))}
       </div>
 
-      {/* THREAT VIEW */}
+      {/* ============ THREAT VIEW ============ */}
       {view === "threat" && (
         <div style={{ padding:"20px 32px", animation:"fadeIn 0.3s ease" }}>
           <div style={{ textAlign:"center", marginBottom:20 }}>
@@ -76,7 +121,6 @@ export default function EcosystemPublic() {
             <p style={{ color:C.dim, fontSize:12, marginTop:4 }}>Las amenazas operan en capas superpuestas — cada una invisible por diseño</p>
           </div>
 
-          {/* Layered visualization */}
           <svg viewBox="0 0 800 200" style={{ width:"100%", maxHeight:180, marginBottom:16 }}>
             {threatLayers.map((l,i) => {
               const y = 30 + i*60;
@@ -88,7 +132,6 @@ export default function EcosystemPublic() {
                   <PulsingOrb x={x+30} y={y+25} r={12} color={l.color}/>
                   <text x={x+52} y={y+22} fill={l.color} fontSize={12} fontWeight="700">{l.label}</text>
                   <text x={x+52} y={y+38} fill={C.dim} fontSize={10}>{l.character}</text>
-                  <text x={x+w-10} y={y+30} fill={l.color} fontSize={14} textAnchor="end" opacity={0.4}>{l.icon}</text>
                 </g>
               );
             })}
@@ -112,79 +155,127 @@ export default function EcosystemPublic() {
         </div>
       )}
 
-      {/* ACTORS VIEW */}
-      {view === "actors" && (
+      {/* ============ TRACEABILITY VIEW ============ */}
+      {view === "trace" && (
         <div style={{ padding:"20px 32px", animation:"fadeIn 0.3s ease" }}>
-          <p style={{ color:C.dim, fontSize:13, lineHeight:1.6, marginBottom:20 }}>
-            La convergencia tecnológica involucra una cadena de mando con roles diferenciados. La responsabilidad es distribuida — lo cual no equivale a su ausencia. Cada actor responde por su contribución.
-          </p>
 
-          <svg viewBox="0 0 900 180" style={{ width:"100%", maxHeight:160, marginBottom:16 }}>
-            {/* Command chain arrow background */}
-            <defs>
-              <linearGradient id="chainGrad" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor={C.coral} stopOpacity={0.15}/>
-                <stop offset="50%" stopColor={C.purple} stopOpacity={0.15}/>
-                <stop offset="100%" stopColor={C.mint} stopOpacity={0.15}/>
-              </linearGradient>
-            </defs>
-            <rect x={70} y={68} width={760} height={4} rx={2} fill="url(#chainGrad)"/>
-
-            {actors.map((a,i) => {
-              const cx = 100+i*175;
-              return (
-                <g key={i}>
-                  <PulsingOrb x={cx} y={70} r={24} color={a.color}/>
-                  <text x={cx} y={68} textAnchor="middle" fill="#fff" fontSize={12} fontWeight="700" dominantBaseline="middle">{a.letter}</text>
-                  <text x={cx} y={115} textAnchor="middle" fill={a.color} fontSize={10.5} fontWeight="600">{a.role}</text>
-                  {i<4 && (
-                    <g>
-                      <line x1={cx+30} y1={70} x2={cx+145} y2={70} stroke={a.color} strokeWidth={1.5} opacity={0.25} strokeDasharray="4 3"/>
-                      <polygon points={`${cx+141},66 ${cx+148},70 ${cx+141},74`} fill={a.color} opacity={0.3}/>
-                    </g>
-                  )}
-                </g>
-              );
-            })}
-
-            {/* Labels */}
-            <text x={100} y={150} fill={C.coral} fontSize={9} fontStyle="italic" opacity={0.5}>Cadena de mando</text>
-            <text x={450} y={150} fill={C.purple} fontSize={9} fontStyle="italic" opacity={0.5} textAnchor="middle">Participación civil</text>
-            <text x={800} y={150} fill={C.mint} fontSize={9} fontStyle="italic" opacity={0.5} textAnchor="end">Beneficio</text>
-          </svg>
-
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
-            {actors.slice(0,3).map((a,i) => (
-              <div key={i} style={{ background:C.card, borderRadius:10, padding:"14px 16px", borderLeft:`3px solid ${a.color}` }}>
-                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
-                  <div style={{ width:24,height:24,borderRadius:"50%",background:a.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,color:"#fff" }}>{a.letter}</div>
-                  <span style={{ fontSize:13, fontWeight:700, color:a.color }}>{a.role}</span>
+          {/* CAPABILITIES */}
+          <div style={{ marginBottom:24 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
+              <div style={{ width:8, height:8, borderRadius:"50%", background:C.coral }}/>
+              <span style={{ fontSize:14, fontWeight:700, color:C.white }}>¿Qué se necesita para desplegar estas tecnologías?</span>
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+              {capabilities.map((cap,i) => (
+                <div key={i} style={{ background:C.card, borderRadius:8, padding:"10px 14px", borderLeft:`2px solid ${cap.color}`, display:"flex", alignItems:"center", gap:10 }}>
+                  <span style={{ color:cap.color, fontSize:14 }}>{cap.icon}</span>
+                  <span style={{ fontSize:11.5, color:C.dim, lineHeight:1.4 }}>{cap.req}</span>
                 </div>
-                <p style={{ fontSize:11, color:C.dim, lineHeight:1.5, margin:0 }}>{a.desc}</p>
-              </div>
-            ))}
-          </div>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginTop:10 }}>
-            {actors.slice(3).map((a,i) => (
-              <div key={i} style={{ background:C.card, borderRadius:10, padding:"14px 16px", borderLeft:`3px solid ${a.color}` }}>
-                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
-                  <div style={{ width:24,height:24,borderRadius:"50%",background:a.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,color:"#fff" }}>{a.letter}</div>
-                  <span style={{ fontSize:13, fontWeight:700, color:a.color }}>{a.role}</span>
-                </div>
-                <p style={{ fontSize:11, color:C.dim, lineHeight:1.5, margin:0 }}>{a.desc}</p>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div style={{ textAlign:"center", marginTop:10 }}>
+              <span style={{ fontSize:11, color:C.amber, fontStyle:"italic" }}>
+                El universo de actores con estas capacidades simultáneas es extremadamente reducido.
+              </span>
+            </div>
           </div>
 
-          <div style={{ background:C.card, borderRadius:10, padding:"14px 20px", textAlign:"center", border:`1px solid ${C.amber}22`, marginTop:16 }}>
-            <span style={{ fontSize:12, color:C.amber, fontWeight:600 }}>
-              La cadena de mando opera con denegabilidad por diseño. La participación civil diluye la atribución. El ecosistema forense documenta cada eslabón.
-            </span>
+          {/* BUDGET */}
+          <div style={{ marginBottom:24 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
+              <div style={{ width:8, height:8, borderRadius:"50%", background:C.amber }}/>
+              <span style={{ fontSize:14, fontWeight:700, color:C.white }}>Presupuesto documentado FY2026 — solo programas públicos, un solo país</span>
+            </div>
+            <div style={{ background:C.card, borderRadius:10, padding:"16px 20px", border:`1px solid ${C.amber}22` }}>
+              {budgetLines.map((b,i) => (
+                <div key={i} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 0", borderBottom: i < budgetLines.length-1 ? `1px solid ${C.slate}22` : "none" }}>
+                  <div>
+                    <span style={{ fontSize:12, color:C.white, fontWeight:600 }}>{b.program}</span>
+                    <span style={{ fontSize:10, color:C.dim, marginLeft:10 }}>{b.source}</span>
+                  </div>
+                  <span style={{ fontSize:14, color:b.color, fontWeight:700, fontFamily:"monospace" }}>{b.amount}</span>
+                </div>
+              ))}
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", paddingTop:12, marginTop:8, borderTop:`2px solid ${C.amber}33` }}>
+                <span style={{ fontSize:13, color:C.amber, fontWeight:700 }}>Total documentado (programas públicos)</span>
+                <span style={{ fontSize:18, color:C.amber, fontWeight:700, fontFamily:"monospace" }}>$950M+</span>
+              </div>
+            </div>
+            <div style={{ textAlign:"center", marginTop:8 }}>
+              <span style={{ fontSize:10, color:C.slate }}>Fuente: ASAFM J-Books, NDAA FY2026, RDTE Budget Justification Documents · No incluye programas clasificados</span>
+            </div>
+          </div>
+
+          {/* HISTORICAL PATTERN */}
+          <div style={{ marginBottom:16 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
+              <div style={{ width:8, height:8, borderRadius:"50%", background:C.purple }}/>
+              <span style={{ fontSize:14, fontWeight:700, color:C.white }}>Patrón histórico documentado — 7 décadas, misma constante</span>
+            </div>
+
+            {/* Timeline SVG */}
+            <svg viewBox="0 0 900 80" style={{ width:"100%", maxHeight:70, marginBottom:8 }}>
+              <line x1={50} y1={35} x2={850} y2={35} stroke={C.slate} strokeWidth={1} opacity={0.3}/>
+              {timeline.map((t,i) => {
+                const cx = 100 + i * 210;
+                return (
+                  <g key={i} style={{ cursor:"pointer" }} onClick={() => setExpandedPhase(expandedPhase===i ? null : i)}>
+                    <PulsingOrb x={cx} y={35} r={expandedPhase===i ? 18 : 14} color={t.color}/>
+                    <text x={cx} y={33} textAnchor="middle" fill="#fff" fontSize={10} fontWeight="700" dominantBaseline="middle">{i+1}</text>
+                    <text x={cx} y={65} textAnchor="middle" fill={t.color} fontSize={9} fontWeight="600">{t.period}</text>
+                  </g>
+                );
+              })}
+            </svg>
+
+            {expandedPhase !== null ? (
+              <div style={{ background:C.card, borderRadius:10, padding:"18px 20px", border:`1px solid ${timeline[expandedPhase].color}33`, animation:"fadeIn 0.2s ease" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
+                  <div style={{ background:timeline[expandedPhase].color, color:"#fff", fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:4 }}>Fase {expandedPhase+1}</div>
+                  <span style={{ fontSize:15, fontWeight:700 }}>{timeline[expandedPhase].phase}</span>
+                  <span style={{ fontSize:12, color:C.dim }}>{timeline[expandedPhase].period}</span>
+                </div>
+
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+                  <div>
+                    <div style={{ fontSize:10, fontWeight:700, color:timeline[expandedPhase].color, marginBottom:6, letterSpacing:0.5 }}>TECNOLOGÍAS DOCUMENTADAS</div>
+                    <p style={{ fontSize:11.5, color:C.dim, lineHeight:1.5, margin:0 }}>{timeline[expandedPhase].tech}</p>
+
+                    <div style={{ fontSize:10, fontWeight:700, color:timeline[expandedPhase].color, marginBottom:6, marginTop:14, letterSpacing:0.5 }}>NIVEL DE EVIDENCIA</div>
+                    <span style={{ fontSize:11, color:C.white, background:`${timeline[expandedPhase].color}20`, padding:"4px 10px", borderRadius:4 }}>{timeline[expandedPhase].pem}</span>
+                  </div>
+                  <div>
+                    <div style={{ fontSize:10, fontWeight:700, color:C.coral, marginBottom:6, letterSpacing:0.5 }}>POBLACIONES CIVILES AFECTADAS</div>
+                    <p style={{ fontSize:11.5, color:C.white, lineHeight:1.5, margin:"0 0 10px", fontWeight:600 }}>{timeline[expandedPhase].civilians}</p>
+
+                    <div style={{ fontSize:10, fontWeight:700, color:timeline[expandedPhase].color, marginBottom:6, letterSpacing:0.5 }}>EVIDENCIA VERIFICABLE</div>
+                    <p style={{ fontSize:11, color:C.dim, lineHeight:1.5, margin:"0 0 10px" }}>{timeline[expandedPhase].evidence}</p>
+
+                    <div style={{ fontSize:10, fontWeight:700, color:C.slate, marginBottom:4, letterSpacing:0.5 }}>FUENTES</div>
+                    <p style={{ fontSize:10, color:C.slate, lineHeight:1.4, margin:0 }}>{timeline[expandedPhase].sources}</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div style={{ background:C.card, borderRadius:10, padding:"16px 20px", textAlign:"center", border:`1px solid ${C.slate}33` }}>
+                <p style={{ color:C.dim, fontSize:12, margin:0 }}>Seleccione una fase para ver el detalle documentado</p>
+              </div>
+            )}
+          </div>
+
+          {/* THE CONSTANT */}
+          <div style={{ background:C.card, borderRadius:10, padding:"16px 20px", textAlign:"center", border:`1px solid ${C.purple}22` }}>
+            <p style={{ fontSize:13, color:C.white, fontWeight:600, margin:"0 0 6px" }}>
+              En cada fase, las tecnologías cambian. La constante que no cambia:
+            </p>
+            <p style={{ fontSize:14, color:C.amber, fontWeight:700, margin:0 }}>
+              Población civil afectada sin consentimiento · Evidencia desclasificada décadas después · Ningún marco regulatorio vigente al momento de la exposición
+            </p>
           </div>
         </div>
       )}
 
-      {/* RESPONSE VIEW */}
+      {/* ============ RESPONSE VIEW ============ */}
       {view === "response" && (
         <div style={{ padding:"20px 32px", animation:"fadeIn 0.3s ease" }}>
           <p style={{ color:C.dim, fontSize:13, lineHeight:1.6, marginBottom:20 }}>
