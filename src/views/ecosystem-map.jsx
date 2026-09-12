@@ -101,6 +101,7 @@ export default function EcosystemPublic() {
         {[
           { key:"threat", label:"Arquitectura de la Amenaza", color:C.coral },
           { key:"trace", label:"Trazabilidad Documentada", color:C.amber },
+          { key:"civil", label:"Participación Civil", color:C.purple },
           { key:"response", label:"Respuesta Forense", color:C.mint },
         ].map(t => (
           <button key={t.key} onClick={() => setView(t.key)} style={{
@@ -270,6 +271,99 @@ export default function EcosystemPublic() {
             </p>
             <p style={{ fontSize:14, color:C.amber, fontWeight:700, margin:0 }}>
               Población civil afectada sin consentimiento · Evidencia desclasificada décadas después · Ningún marco regulatorio vigente al momento de la exposición
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ============ CIVIL PARTICIPATION VIEW ============ */}
+      {view === "civil" && (
+        <div style={{ padding:"20px 32px", animation:"fadeIn 0.3s ease" }}>
+
+          {/* Intro */}
+          <div style={{ textAlign:"center", marginBottom:20 }}>
+            <span style={{ fontSize:12, color:C.purple, fontWeight:600 }}>EL ESLABÓN MENOS VISIBLE DE LA CADENA</span>
+            <p style={{ color:C.dim, fontSize:13, marginTop:6, maxWidth:700, margin:"6px auto 0", lineHeight:1.6 }}>
+              Entre quien ordena y quien se beneficia, existe un actor que no es profesional, no es técnico y no es comercial. Es un civil instrumentalizado — consciente o inconscientemente — para facilitar el despliegue local.
+            </p>
+          </div>
+
+          {/* What it is NOT */}
+          <div style={{ display:"flex", gap:10, marginBottom:16, justifyContent:"center", flexWrap:"wrap" }}>
+            {[
+              { label:"No es operador", desc:"No tiene formación técnica ni acceso a sistemas de control", color:C.coral },
+              { label:"No es intermediario", desc:"No opera comercialmente ni provee infraestructura", color:C.amber },
+              { label:"No es beneficiario", desc:"No obtiene la ventaja estratégica de la operación", color:C.teal },
+            ].map((n,i) => (
+              <div key={i} style={{ background:C.card, borderRadius:8, padding:"10px 16px", border:`1px solid ${n.color}22`, flex:"1 1 200px", maxWidth:260 }}>
+                <div style={{ fontSize:12, fontWeight:700, color:n.color, marginBottom:4 }}>✗ {n.label}</div>
+                <div style={{ fontSize:11, color:C.dim }}>{n.desc}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* What it IS */}
+          <div style={{ background:C.card, borderRadius:10, padding:"18px 22px", border:`1px solid ${C.purple}33`, marginBottom:16 }}>
+            <div style={{ fontSize:13, fontWeight:700, color:C.purple, marginBottom:10 }}>¿Qué es entonces?</div>
+            <p style={{ fontSize:13, color:C.white, lineHeight:1.7, margin:"0 0 10px" }}>
+              Es una persona del entorno inmediato del target — vecino, compañero de trabajo, prestador de servicios, conocido casual — que es reclutada para realizar acciones específicas que facilitan la operación sin que necesariamente comprenda su propósito real.
+            </p>
+            <p style={{ fontSize:12, color:C.dim, lineHeight:1.6, margin:0 }}>
+              Su participación cumple dos funciones simultáneas: reduce los costos operativos del despliegue (no se necesita personal profesional en terreno permanente) y aumenta la denegabilidad de la cadena de mando (la acción se diluye entre civiles sin perfil operacional).
+            </p>
+          </div>
+
+          {/* Mechanisms */}
+          <div style={{ marginBottom:16 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
+              <div style={{ width:8, height:8, borderRadius:"50%", background:C.amber }}/>
+              <span style={{ fontSize:14, fontWeight:700, color:C.white }}>Mecanismos de instrumentalización documentados</span>
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+              {[
+                { mode:"Incentivo económico", desc:"Compensación directa o indirecta a cambio de acciones específicas: instalar dispositivos, reportar movimientos, facilitar acceso a espacios.", color:C.amber, icon:"$" },
+                { mode:"Coerción", desc:"Presión mediante información comprometedora, amenaza implícita, o dependencia laboral/económica preexistente. El participante actúa por temor, no por convicción.", color:C.coral, icon:"!" },
+                { mode:"Desconocimiento del alcance", desc:"Se le asigna una tarea aparentemente inocua — 'monitorear', 'reportar si sale', 'dejar encendido este equipo' — sin revelar su función real dentro de la cadena.", color:C.teal, icon:"?" },
+                { mode:"Ideologización", desc:"Convencimiento de que el target representa una amenaza o merece vigilancia. Se construye una narrativa que justifica la participación como un acto cívico o de seguridad.", color:C.purple, icon:"◈" },
+              ].map((m,i) => (
+                <div key={i} style={{ background:C.card, borderRadius:10, padding:"14px 16px", borderLeft:`3px solid ${m.color}` }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+                    <div style={{ width:24, height:24, borderRadius:"50%", background:`${m.color}25`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, color:m.color, fontWeight:700 }}>{m.icon}</div>
+                    <span style={{ fontSize:12, fontWeight:700, color:m.color }}>{m.mode}</span>
+                  </div>
+                  <p style={{ fontSize:11, color:C.dim, lineHeight:1.5, margin:0 }}>{m.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Judicial relevance */}
+          <div style={{ marginBottom:16 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
+              <div style={{ width:8, height:8, borderRadius:"50%", background:C.coral }}/>
+              <span style={{ fontSize:14, fontWeight:700, color:C.white }}>¿Por qué importa para el juez laboral?</span>
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
+              {[
+                { point:"Dilución de la atribución", desc:"La participación de civiles dificulta identificar quién es responsable. La cadena de mando se oculta detrás de actores sin perfil operacional.", color:C.coral },
+                { point:"Testigos convertidos en actores", desc:"Personas que podrían ser testigos del fenómeno se convierten en participantes, eliminando fuentes de corroboración independiente.", color:C.amber },
+                { point:"Evidencia documentable", desc:"La participación civil deja rastros: patrones de coordinación, comunicaciones, dispositivos instalados, cambios de rutina. El ecosistema forense puede documentarlos.", color:C.mint },
+              ].map((p,i) => (
+                <div key={i} style={{ background:C.card, borderRadius:10, padding:"14px 16px", borderTop:`3px solid ${p.color}` }}>
+                  <div style={{ fontSize:12, fontWeight:700, color:p.color, marginBottom:6 }}>{p.point}</div>
+                  <p style={{ fontSize:11, color:C.dim, lineHeight:1.5, margin:0 }}>{p.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Pattern */}
+          <div style={{ background:C.card, borderRadius:10, padding:"16px 20px", textAlign:"center", border:`1px solid ${C.purple}22` }}>
+            <p style={{ fontSize:12, color:C.dim, margin:"0 0 8px" }}>
+              Este patrón está documentado desde la Fase I (1950s): civiles reclutados como intermediarios locales en programas de experimentación sin consentimiento.
+            </p>
+            <p style={{ fontSize:13, color:C.purple, fontWeight:700, margin:0 }}>
+              La participación civil no es una anomalía. Es una característica estructural de la cadena de mando que se repite en cada fase tecnológica documentada.
             </p>
           </div>
         </div>
