@@ -53,7 +53,7 @@ function ParticleBackground() {
     window.addEventListener('resize', handleResize);
     return () => { cancelAnimationFrame(frame); window.removeEventListener('resize',handleResize); renderer.dispose(); if(container.contains(renderer.domElement)) container.removeChild(renderer.domElement); };
   }, []);
-  return <div ref={mountRef} style={{ position:'absolute', inset:0 }} />;
+  return <div ref={mountRef} style={{ position:'fixed', inset:0, zIndex:0 }} />;
 }
 
 export default function App() {
@@ -79,7 +79,7 @@ export default function App() {
   };
 
   return (
-    <div style={{ width:'100%', minHeight:'100vh', position:'relative', fontFamily:"'Inter','JetBrains Mono',sans-serif", color:'#e2e8f0', overflow:'auto' }}>
+    <div style={{ width:'100%', minHeight:'100vh', position:'relative', fontFamily:"'Inter','JetBrains Mono',sans-serif", color:'#e2e8f0' }}>
       <ParticleBackground />
       <div style={{ position:'relative', zIndex:10, width:'100%', minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'40px 20px' }}>
 
